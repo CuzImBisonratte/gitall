@@ -9,6 +9,7 @@ const readline = require('readline');
 // Variables
 // 
 var dirs_with_git = [];
+var command;
 
 // Create a readline interface 
 const rl = readline.createInterface({
@@ -44,13 +45,13 @@ function scandir(full_path) {
                         if (fs.existsSync(full_path + '\\' + file + '\\.git')) {
 
                             // If it is, run git pull in the directory
-                            exec('git pull', {
+                            exec(command, {
                                 cwd: full_path + '\\' + file
                             }, (err, stdout, stderr) => {
 
                                 // If there is an error, print it
-                                if (err) {
-                                    console.log(err);
+                                if (err || stderr) {
+                                    console.log(err || stderr);
                                 } else {
 
                                     // If there is no error, print the output
@@ -69,13 +70,52 @@ function scandir(full_path) {
 
 }
 
-// Ask if the user wants to scan the directory
-rl.question('Do you want to scan the directory ' + parent_dir + '? (y/n) ', (answer) => {
-    if (answer === 'y') {
+// Ask what the user wants to to with the directory
+console.clear();
+console.log('What do you want to do within the directory ' + parent_dir + '?');
+rl.question('1> Git Pull all subdirectories\n2> Git Push all subdirectories\n3> Custom command?\n> ', (answer) => {
+    if (answer == '1') {
+
+        // Set the command to git pull
+        command = 'git pull';
 
         // Scan the parents parent directory with the scandir function
-        scandir(parent_dir)
-    }
-    rl.close();
+        scandir(parent_dir);
 
+        // Close the readline interface
+        rl.close();
+
+    } else if (answer == '2') {
+
+        // Set the command to git push
+        command = 'git push';
+
+        // Scan the parents parent directory with the scandir function
+        scandir(parent_dir);
+
+        // Close the readline interface
+        rl.close();
+
+    } else if (answer == '3') {
+
+        // Ask the user for the command
+        rl.question('Enter the custom command\n> ', (answer) => {
+
+            // Set the command to the user input
+            command = answer;
+
+            // Scan the parents parent directory with the scandir function
+            scandir(parent_dir);
+
+            // Close the readline interface
+            rl.close();
+
+        });
+
+    } else {
+
+        // If the user input is not 1, 2 or 3, print an error
+        console.log('Error: Invalid input');
+
+    }
 });
