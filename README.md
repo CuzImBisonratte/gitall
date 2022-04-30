@@ -1,3 +1,3 @@
-# Pullall
+# GITall
 
-Pullall is a simple tool to pull all the git repos in a directory.
+GITall is a simple tool to pull all the git repos in a directory.
